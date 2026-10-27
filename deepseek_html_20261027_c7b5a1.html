@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💎 恋与深空 · 攒钻记录</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0f1117;
+    --card:#181b24;
+    --card2:#1f2330;
+    --line:#2a2f3d;
+    --text:#e8eaf0;
+    --text2:#c5cad6;
+    --muted:#8b93a7;
+    --faint:#5c6478;
+    --accent:#c96b9e;
+    --accent-light:#e8a0c4;
+    --accent-deep:#8b5cf6;
+    --accent-rgb:201,107,158;
+    --green:#3ddc97;
+    --red:#ff6b81;
+    --gold:#f0c674;
+    --chip-active:#222a2a;
+    --toast-bg:#252a38;
+  }
+  body{
+    background:var(--bg);color:var(--text);min-height:100vh;padding:16px;
+    display:flex;justify-content:center;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    transition:background-color .2s ease;
+  }
+  .app{width:100%;max-width:520px;padding-bottom:40px}
+
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  h1{font-size:18px;font-weight:700;letter-spacing:.5px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tools{display:flex;gap:6px;flex-shrink:0}
+  .tools button,.tools label{
+    font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--line);
+    padding:6px 10px;border-radius:8px;cursor:pointer;font-family:inherit;
+  }
+  .tools button:active,.tools label:active{background:var(--card2)}
+
+  .tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    padding:8px 15px;border-radius:10px;background:var(--card);border:1px solid var(--line);
+    color:var(--muted);font-size:14px;white-space:nowrap;cursor:pointer;
+    font-family:inherit;transition:.15s;
+  }
+  .tab.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  .tab.add{color:var(--muted);font-weight:400}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+  .title{font-size:13px;color:var(--muted);margin-bottom:10px;font-weight:600}
+  .title span{font-weight:400;color:var(--faint);font-size:12px;margin-left:4px}
+  .title-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+  .title-row .title{margin-bottom:0}
+
+  .mini-btn{
+    flex-shrink:0;font-size:12px;color:var(--muted);background:var(--card2);
+    border:1px solid var(--line);padding:5px 11px;border-radius:8px;
+    cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;
+  }
+  .mini-btn:active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  .goal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+  .goal-title{
+    font-size:14px;font-weight:600;color:var(--accent-light);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+
+  .balance{font-size:38px;font-weight:700;letter-spacing:-1.5px;line-height:1.1;
+    font-variant-numeric:tabular-nums}
+  .balance small{font-size:14px;color:var(--muted);font-weight:400;margin-left:6px;letter-spacing:0}
+  .sub{color:var(--muted);font-size:13px;margin-top:6px}
+  .sub b{color:var(--accent);font-weight:600}
+
+  .bar{height:8px;background:var(--card2);border-radius:4px;overflow:hidden;margin-top:14px}
+  .bar>i{display:block;height:100%;width:0;border-radius:4px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-light));transition:width .35s ease}
+  .row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:8px;gap:10px}
+  .goal-meta{font-size:12px;color:var(--muted);margin-top:10px;padding-top:10px;
+    border-top:1px solid var(--line);line-height:1.5}
+  .goal-meta b{color:var(--accent);font-weight:600}
+  .goal-meta .warn{color:#ffb86b}
+  .pay-meta{font-size:12px;color:var(--muted);margin-top:8px;display:none;line-height:1.5}
+  .pay-meta.show{display:block}
+  .pay-meta b{color:var(--gold);font-weight:600}
+
+  .btn-row{display:flex;gap:8px;margin-bottom:12px}
+  .ghost-btn{
+    flex:1;padding:13px 8px;border-radius:14px;border:1px solid var(--line);
+    background:var(--card);color:var(--text);font-size:14px;font-weight:600;
+    cursor:pointer;font-family:inherit;transition:.15s;
+  }
+  .ghost-btn:active{background:var(--card2);transform:scale(.98)}
+
+  .quick-grid{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    flex:1 1 calc(50% - 4px);min-width:0;
+    padding:11px 12px;border-radius:12px;border:1px solid var(--line);
+    background:var(--card2);color:var(--text);cursor:pointer;
+    display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+    font-family:inherit;transition:.12s;text-align:left;
+  }
+  .chip:active{transform:scale(.96);border-color:var(--green);background:var(--chip-active)}
+  .chip .cn{font-size:13px;font-weight:600;max-width:100%;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .chip .ca{font-size:12px;color:var(--green);font-weight:600;font-variant-numeric:tabular-nums}
+
+  .checkin-btn{
+    width:100%;padding:14px;border-radius:12px;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:#fff;font-size:16px;font-weight:700;
+    font-family:inherit;transition:.2s;letter-spacing:.5px;
+  }
+  .checkin-btn:active{transform:scale(.98)}
+  .checkin-btn.done{
+    background:var(--card2);color:var(--green);border:1px solid rgba(61,220,151,.3);
+    font-size:15px;letter-spacing:0;
+  }
+  .ci-row{display:flex;gap:8px;margin-top:8px;align-items:center}
+  .ci-name{
+    flex:1;min-width:0;padding:9px 11px;border-radius:9px;border:1px solid var(--line);
+    background:var(--card2);color:var(--text);font-size:14px;font-family:inherit;outline:none;
+  }
+  .ci-amt{
+    flex:0 0 30%;padding:9px 11px;border-radius:9px;border:1px solid var(--line);
+    background:var(--card2);color:var(--text);font-size:14px;font-family:inherit;outline:none;
+    text-align:right;
+  }
+  .ci-name:focus,.ci-amt:focus{border-color:var(--accent)}
+  .ci-del{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+  .ci-del:active{color:var(--red)}
+  .add-ci{
+    width:100%;margin-top:10px;padding:9px;border-radius:9px;border:1px dashed var(--line);
+    background:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit;
+  }
+  .add-ci:active{background:var(--card2)}
+
+  .entry{display:flex;gap:8px;margin-bottom:8px}
+  .entry:last-child{margin-bottom:0}
+  .entry input{
+    flex:1;min-width:0;padding:11px 13px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card2);color:var(--text);font-size:15px;font-family:inherit;outline:none;
+  }
+  .entry input::placeholder{color:var(--faint)}
+  .entry input:focus{border-color:var(--accent)}
+  .entry input[type=number]{flex:0 0 42%}
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+  .btn{
+    flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--card2);
+    color:var(--text);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn.in{color:var(--green);border-color:rgba(61,220,151,.28)}
+  .btn.out{color:var(--red);border-color:rgba(255,107,129,.28)}
+  .btn.pay{flex:none;width:100%;color:var(--gold);border-color:rgba(240,198,116,.3)}
+
+  .converter{
+    margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+  }
+  .conv-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px}
+  .conv-head .clabel{font-size:12px;color:var(--muted);font-weight:600}
+  .conv-rate{font-size:11px;color:var(--faint);white-space:nowrap}
+  .conv-body{display:flex;align-items:center;gap:8px}
+  .conv-body input{
+    flex:1;min-width:0;padding:10px 8px;border-radius:10px;
+    border:1px solid var(--line);background:var(--card2);color:var(--text);
+    font-size:15px;font-family:inherit;outline:none;text-align:center;
+    font-variant-numeric:tabular-nums;
+  }
+  .conv-body input::placeholder{color:var(--faint);font-size:13px}
+  .conv-body input:focus{border-color:var(--accent)}
+  .conv-arrow{color:var(--accent);font-size:16px;flex-shrink:0;font-weight:700}
+  .conv-note{font-size:11px;color:var(--faint);margin-top:8px;text-align:center}
+
+  .item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .item:last-child{border-bottom:none}
+  .item .t{color:var(--muted);font-size:12px;width:42px;flex-shrink:0;font-variant-numeric:tabular-nums}
+  .item .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2)}
+  .item .a{font-weight:600;font-variant-numeric:tabular-nums}
+  .item .a.pos{color:var(--green)}
+  .item .a.neg{color:var(--red)}
+  .item .a.pay{color:var(--gold);font-size:13px}
+  .item .del{background:none;border:none;color:var(--faint);font-size:18px;cursor:pointer;padding:0 2px;line-height:1}
+  .item .del:active{color:var(--red)}
+  .pay-tag{
+    display:inline-block;font-size:11px;color:var(--gold);
+    background:rgba(240,198,116,.12);border:1px solid rgba(240,198,116,.25);
+    padding:1px 6px;border-radius:5px;margin-left:4px;font-weight:600;
+    vertical-align:middle;
+  }
+  .empty{color:var(--faint);font-size:13px;text-align:center;padding:16px 0}
+
+  .modal{
+    position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;
+    display:none;align-items:center;justify-content:center;padding:20px;
+    backdrop-filter:blur(2px);
+  }
+  .modal.show{display:flex}
+  .modal-box{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:20px;width:100%;max-width:380px;max-height:86vh;
+    display:flex;flex-direction:column;overflow-y:auto;
+  }
+  .modal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
+  .modal-head h2{font-size:16px;font-weight:700}
+  .modal-box label{display:block;font-size:12px;color:var(--muted);margin-bottom:12px}
+  .modal-box input[type=text],.modal-box input[type=number],.modal-box input[type=date]{
+    width:100%;margin-top:6px;padding:10px 12px;border-radius:9px;
+    border:1px solid var(--line);background:var(--card2);color:var(--text);
+    font-size:15px;font-family:inherit;outline:none;
+  }
+  .modal-box input:focus{border-color:var(--accent)}
+
+  input[type=color]{
+    -webkit-appearance:none;appearance:none;
+    border:1px solid var(--line);border-radius:10px;
+    background:var(--card2);cursor:pointer;padding:3px;
+  }
+  input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+  input[type=color]::-webkit-color-swatch{border:none;border-radius:7px}
+  input[type=color]::-moz-color-swatch{border:none;border-radius:7px}
+  .color-input{width:100%;height:44px;margin-top:6px}
+  .color-input.small{width:64px;height:40px;margin-top:0}
+  .color-row{display:flex;align-items:center;gap:10px;margin-top:6px}
+  .color-text{font-size:13px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+
+  .theme-section{margin-bottom:16px}
+  .section-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px}
+  .swatches{display:flex;flex-wrap:wrap;gap:12px}
+  .swatch{
+    width:40px;height:40px;border-radius:50%;
+    cursor:pointer;transition:.15s;position:relative;flex-shrink:0;
+    border:2px solid transparent;padding:0;
+  }
+  .swatch:hover{transform:scale(1.08)}
+  .swatch.active{
+    box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--text);
+  }
+  .theme-preview{
+    background:var(--bg);border:1px solid var(--line);border-radius:12px;
+    padding:14px;margin:6px 0 4px;
+  }
+  .tp-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .tp-bar{height:8px;background:var(--card2);border-radius:4px;overflow:hidden;margin-bottom:12px}
+  .tp-bar>i{display:block;height:100%;width:65%;border-radius:4px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-light))}
+  .tp-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .tp-btn{padding:8px 15px;border-radius:10px;color:#fff;font-size:13px;font-weight:700;
+    background:linear-gradient(135deg,var(--accent),var(--accent-deep))}
+  .tp-chip{padding:8px 12px;border-radius:10px;background:var(--card2);
+    border:1px solid var(--line);font-size:12px;color:var(--green);font-weight:600}
+
+  .quick{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .quick button{
+    flex:1;min-width:56px;padding:8px 4px;font-size:12px;border-radius:8px;
+    border:1px solid var(--line);background:var(--card2);color:var(--muted);
+    cursor:pointer;font-family:inherit;transition:.15s;
+  }
+  .quick button:active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .modal-actions{display:flex;gap:8px;margin-top:16px}
+  .modal-actions button{
+    flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);
+    background:var(--card2);color:var(--text);font-size:14px;font-weight:600;
+    cursor:pointer;font-family:inherit;
+  }
+  .modal-actions .primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .modal-actions button:active{transform:scale(.97)}
+
+  .hint{font-size:12px;color:var(--faint);margin-bottom:14px}
+
+  .log-summary{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .log-summary span{
+    font-size:12px;color:var(--muted);background:var(--card2);
+    padding:6px 10px;border-radius:8px;
+  }
+  .log-summary b{font-weight:600;color:var(--text)}
+  .log-list{flex:1;overflow-y:auto;min-height:80px;overscroll-behavior:contain}
+
+  #chartBig{width:100%;height:190px;display:block}
+  .chart-info{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6}
+  .chart-info b{color:var(--accent);font-weight:600}
+
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(16px);
+    background:var(--toast-bg);border:1px solid var(--line);color:var(--text);
+    padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;
+    opacity:0;pointer-events:none;transition:.25s ease;z-index:300;
+    white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast b{color:var(--green)}
+  .toast b.gold{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 id="appTitle">💎 恋与深空 · 攒钻</h1>
+    <div class="tools">
+      <button id="themeBtn">🎨 主题</button>
+      <button id="export">导出</button>
+      <label>导入<input type="file" id="import" accept=".json" hidden></label>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="card">
+    <div class="goal-head">
+      <span class="goal-title" id="goalTitle">—</span>
+      <button class="mini-btn" id="goalEdit">编辑目标</button>
+    </div>
+    <div class="balance"><span id="bal">0</span><small id="balUnit">红钻</small></div>
+    <div class="sub" id="sub"></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="row"><span id="progLeft"></span><span id="progRight"></span></div>
+    <div class="goal-meta" id="goalMeta"></div>
+    <div class="pay-meta" id="payMeta"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="ghost-btn" id="openChart">📈 攒钻趋势</button>
+    <button class="ghost-btn" id="openLog">📜 流水记录</button>
+  </div>
+
+  <div class="card">
+    <div class="title-row">
+      <div class="title">每日打卡<span>今日固定收入</span></div>
+      <button class="mini-btn" id="openQuick">⚡ 快捷收入</button>
+    </div>
+    <button class="checkin-btn" id="checkinBtn">一键打卡</button>
+    <div id="checkinList"></div>
+    <button class="add-ci" id="addCheckin">＋ 添加打卡项</button>
+  </div>
+
+  <div class="card">
+    <div class="entry">
+      <input id="amount" type="number" inputmode="decimal" placeholder="红钻数量">
+      <input id="note" type="text" placeholder="备注（活动 / 补偿…）" maxlength="20">
+    </div>
+    <div class="entry">
+      <button class="btn in" data-sign="1">＋ 收入</button>
+      <button class="btn out" data-sign="-1">－ 支出</button>
+    </div>
+    <div class="entry">
+      <button class="btn pay" id="openPay">💰 记录氪金</button>
+    </div>
+
+    <div class="converter">
+      <div class="conv-head">
+        <span class="clabel">红钻 ⇄ 金票</span>
+        <span class="conv-rate" id="convRate">150 红钻 = 1 金票</span>
+      </div>
+      <div class="conv-body">
+        <input id="convGem" type="number" inputmode="decimal" placeholder="红钻数量">
+        <span class="conv-arrow">⇄</span>
+        <input id="convTicket" type="number" inputmode="decimal" placeholder="金票数量">
+      </div>
+      <div class="conv-note">输入一边，自动换算另一边</div>
+    </div>
+  </div>
+</div>
+
+<!-- 氪金记录弹窗 -->
+<div class="modal" id="payModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>记录氪金</h2></div>
+    <label>充值金额（元）
+      <input id="payAmountInput" type="number" inputmode="decimal" min="0" step="0.01" placeholder="如 30">
+    </label>
+    <div class="quick" id="payQuick">
+      <button data-pay="6">6</button>
+      <button data-pay="30">30</button>
+      <button data-pay="68">68</button>
+      <button data-pay="128">128</button>
+      <button data-pay="328">328</button>
+      <button data-pay="648">648</button>
+    </div>
+    <label>折算红钻（选填）
+      <input id="payGemInput" type="number" inputmode="decimal" min="0" placeholder="不填或 0 则只记金额，不增加余额">
+    </label>
+    <label>备注（选填）
+      <input id="payNoteInput" type="text" maxlength="20" placeholder="如 月卡 / 3.0限定池">
+    </label>
+    <div class="modal-actions">
+      <button id="payCancel">取消</button>
+      <button id="paySave" class="primary">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 主题配色弹窗 -->
+<div class="modal" id="themeModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>主题配色</h2></div>
+    <div class="hint" id="themeHint">仅对当前游戏生效</div>
+
+    <div class="theme-section">
+      <div class="section-label">强调色</div>
+      <div class="swatches" id="accentSwatches"></div>
+      <div class="color-row">
+        <input id="accentColorInput" type="color" value="#c96b9e" class="color-input">
+        <span class="color-text" id="accentColorText">#C96B9E</span>
+      </div>
+    </div>
+
+    <div class="theme-section">
+      <div class="section-label">背景色</div>
+      <div class="swatches" id="bgSwatches"></div>
+      <div class="color-row">
+        <input id="bgColorInput" type="color" value="#0f1117" class="color-input">
+        <span class="color-text" id="bgColorText">#0F1117</span>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-bottom:8px">预览</div>
+    <div class="theme-preview">
+      <div class="tp-card">
+        <div class="tp-bar"><i></i></div>
+        <div class="tp-btns">
+          <span class="tp-btn">一键打卡</span>
+          <span class="tp-chip">每周任务 +150</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button id="themeCancel">取消</button>
+      <button id="themeSave" class="primary">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 添加游戏弹窗 -->
+<div class="modal" id="gameModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>添加游戏</h2></div>
+    <label>游戏名称
+      <input id="gameNameInput" type="text" maxlength="16" placeholder="如：恋与深空">
+    </label>
+    <label>货币名称
+      <input id="gameCurrencyInput" type="text" maxlength="8" placeholder="如：红钻" value="红钻">
+    </label>
+    <label>每抽需要多少货币
+      <input id="gamePerPullInput" type="number" inputmode="numeric" min="1" value="150">
+    </label>
+    <label>目标抽数
+      <input id="gameTargetInput" type="number" inputmode="numeric" min="1" value="140">
+    </label>
+    <label>主题色
+      <div class="color-row">
+        <input id="gameColorInput" type="color" value="#c96b9e" class="color-input small">
+        <span class="color-text" id="gameColorText">#C96B9E</span>
+      </div>
+    </label>
+    <div class="modal-actions">
+      <button id="gameCancel">取消</button>
+      <button id="gameSave" class="primary">添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 目标编辑弹窗 -->
+<div class="modal" id="goalModal">
+  <div class="modal-box">
+    <div class="modal-head"><h2>编辑目标</h2></div>
+    <label>目标内容
+      <input id="goalTitleInput" type="text" maxlength="24" placeholder="如：抽 3.0 新卡大保底">
+    </label>
+    <label>目标抽数
+      <input id="goalPullsInput" type="number" inputmode="numeric" min="1" placeholder="140">
+    </label>
+    <div class="quick">
+      <button data-pull="70">小保底 70</button>
+      <button data-pull="140">大保底 140</button>
+      <button data-pull="180">180 抽</button>
+    </div>
+    <label>截止日期（可选）
+      <input id="goalDateInput" type="date">
+    </label>
+    <div class="modal-actions">
+      <button id="goalCancel">取消</button>
+      <button id="goalSave" class="primary">保存目标</button>
+    </div>
+  </div>
+</div>
+
+<!-- 快捷收入弹窗 -->
+<div class="modal" id="quickModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>快捷收入</h2>
+      <button class="mini-btn" id="quickToggleMode">编辑</button>
+    </div>
+
+    <div id="quickUseView" style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <div class="hint">点一下记录一笔，可以连续点</div>
+      <div class="quick-grid" id="quickChips" style="overflow-y:auto;overscroll-behavior:contain"></div>
+      <div class="modal-actions">
+        <button id="quickClose">关闭</button>
+      </div>
+    </div>
+
+    <div id="quickEditView" style="display:none">
+      <div id="quickEditList" style="max-height:50vh;overflow-y:auto;overscroll-behavior:contain"></div>
+      <button class="add-ci" id="quickAddRow">＋ 添加一项</button>
+      <div class="modal-actions">
+        <button id="quickCancelEdit">取消</button>
+        <button id="quickSave" class="primary">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 趋势弹窗 -->
+<div class="modal" id="chartModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>攒钻趋势</h2>
+      <button class="mini-btn" id="chartClose">关闭</button>
+    </div>
+    <canvas id="chartBig"></canvas>
+    <div class="chart-info" id="chartInfo"></div>
+  </div>
+</div>
+
+<!-- 流水弹窗 -->
+<div class="modal" id="logModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>流水记录</h2>
+      <button class="mini-btn" id="logClose">关闭</button>
+    </div>
+    <div class="log-summary" id="logSummary"></div>
+    <div class="log-list" id="logList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'lysk-gem-tracker-v1';
+const DAY = 86400000;
+
+const DEFAULT_ITEMS = [
+  { id: 'ci1', name: '每日任务', amount: 50 },
+  { id: 'ci2', name: '月卡',     amount: 100 }
+];
+
+const DEFAULT_QUICK = [
+  { id: 'q1', name: '每周任务',   amount: 150 },
+  { id: 'q2', name: '每周分享',   amount: 10 },
+  { id: 'q3', name: '家园周任务', amount: 50 }
+];
+
+const PRESET_ACCENTS = [
+  { name: '深空粉', color: '#c96b9e' },
+  { name: '星空紫', color: '#8b5cf6' },
+  { name: '玫瑰红', color: '#e8556d' },
+  { name: '蜜桃橙', color: '#f08a5d' },
+  { name: '香槟金', color: '#d4a373' },
+  { name: '薄荷绿', color: '#3ddc97' },
+  { name: '湖水蓝', color: '#4a9ff5' },
+  { name: '薰衣草', color: '#a78bfa' }
+];
+
+const PRESET_BGS = [
+  { name: '深空黑', color: '#0f1117' },
+  { name: '午夜蓝', color: '#0d1320' },
+  { name: '墨夜绿', color: '#0e1a16' },
+  { name: '暖夜棕', color: '#191310' },
+  { name: '暗夜紫', color: '#14101e' },
+  { name: '浅雾灰', color: '#eef0f5' },
+  { name: '奶油白', color: '#f7f2e9' },
+  { name: '樱花白', color: '#fbf0f4' }
+];
+
+const DEFAULT = {
+  activeId: 'lysk',
+  games: [
+    {
+      id: 'lysk',
+      name: '恋与深空',
+      currency: '红钻',
+      perPull: 150,
+      goal: { title: '大保底攒钻', targetPulls: 140, deadline: '' },
+      checkinItems: structuredClone(DEFAULT_ITEMS),
+      quickItems: structuredClone(DEFAULT_QUICK),
+      theme: { accent: '#c96b9e', bg: '#0f1117' }
+    }
+  ],
+  records: []
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dayKey = ts => { const d = new Date(ts); return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); };
+const uid = p => p + Date.now() + Math.random().toString(36).slice(2, 6);
+const isHex = v => typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v);
+const money = n => {
+  const v = Math.round(Number(n) * 100) / 100;
+  return Number.isInteger(v) ? v.toLocaleString() : v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
+let state;
+
+/* ---------------- 颜色工具 ---------------- */
+
+function hexToHsl(hex){
+  hex = String(hex).replace('#','');
+  if(hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const r = parseInt(hex.slice(0,2),16)/255;
+  const g = parseInt(hex.slice(2,4),16)/255;
+  const b = parseInt(hex.slice(4,6),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h = 0, s = 0, l = (max+min)/2;
+  if(max !== min){
+    const d = max - min;
+    s = l > .5 ? d/(2-max-min) : d/(max+min);
+    if(max === r) h = (g-b)/d + (g<b?6:0);
+    else if(max === g) h = (b-r)/d + 2;
+    else h = (r-g)/d + 4;
+    h *= 60;
+  }
+  return { h: Math.round(h), s: Math.round(s*100), l: Math.round(l*100) };
+}
+
+function hslToHex(h, s, l){
+  h = ((h % 360) + 360) % 360;
+  s = Math.max(0, Math.min(100, s)) / 100;
+  l = Math.max(0, Math.min(100, l)) / 100;
+  const k = n => (n + h/30) % 12;
+  const a = s * Math.min(l, 1-l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n)-3, Math.min(9-k(n), 1)));
+  const toHex = x => Math.round(x*255).toString(16).padStart(2,'0');
+  return '#' + toHex(f(0)) + toHex(f(8)) + toHex(f(4));
+}
+
+function hexToRgbStr(hex){
+  hex = String(hex).replace('#','');
+  if(hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const r = parseInt(hex.slice(0,2),16);
+  const g = parseInt(hex.slice(2,4),16);
+  const b = parseInt(hex.slice(4,6),16);
+  return `${r},${g},${b}`;
+}
+
+function deriveTheme(g){
+  const accent = (g && g.theme && g.theme.accent) || '#c96b9e';
+  const bg = (g && g.theme && g.theme.bg) || '#0f1117';
+
+  const a = hexToHsl(accent);
+  const b = hexToHsl(bg);
+  const isLight = b.l > 56;
+
+  const mk = (dl, ds = 0) =>
+    hslToHex(b.h, Math.max(0, Math.min(100, b.s + ds)), Math.max(0, Math.min(100, b.l + dl)));
+
+  const card  = mk(isLight ? 4 : 4);
+  const card2 = mk(isLight ? -3 : 8);
+  const line  = mk(isLight ? -11 : 13);
+
+  const text   = isLight ? hslToHex(b.h, 22, 12) : hslToHex(b.h, 12, 94);
+  const text2  = isLight ? hslToHex(b.h, 16, 26) : hslToHex(b.h, 8, 80);
+  const muted  = isLight ? hslToHex(b.h, 12, 40) : hslToHex(b.h, 8, 62);
+  const faint  = isLight ? hslToHex(b.h, 10, 56) : hslToHex(b.h, 8, 42);
+
+  const chipActive = mk(isLight ? -8 : 10);
+  const toastBg    = mk(isLight ? 8 : 10);
+  const green = isLight ? '#0f9e63' : '#3ddc97';
+  const red   = isLight ? '#dc3d52' : '#ff6b81';
+  const gold  = isLight ? '#9a6a10' : '#f0c674';
+
+  return {
+    bg,
+    card, card2, line,
+    text, text2, muted, faint,
+    chipActive, toastBg,
+    green, red, gold,
+    isLight,
+    accent,
+    accentLight: hslToHex(a.h, Math.min(100, a.s + 8), Math.min(88, a.l + 18)),
+    accentDeep:  hslToHex(a.h, Math.max(18, a.s - 5), Math.max(22, a.l - 12)),
+    accentRgb:   hexToRgbStr(accent)
+  };
+}
+
+function applyTheme(g){
+  const t = deriveTheme(g);
+  const root = document.documentElement.style;
+  root.setProperty('--bg', t.bg);
+  root.setProperty('--card', t.card);
+  root.setProperty('--card2', t.card2);
+  root.setProperty('--line', t.line);
+  root.setProperty('--text', t.text);
+  root.setProperty('--text2', t.text2);
+  root.setProperty('--muted', t.muted);
+  root.setProperty('--faint', t.faint);
+  root.setProperty('--chip-active', t.chipActive);
+  root.setProperty('--toast-bg', t.toastBg);
+  root.setProperty('--green', t.green);
+  root.setProperty('--red', t.red);
+  root.setProperty('--gold', t.gold);
+  root.setProperty('--accent', t.accent);
+  root.setProperty('--accent-light', t.accentLight);
+  root.setProperty('--accent-deep', t.accentDeep);
+  root.setProperty('--accent-rgb', t.accentRgb);
+  document.documentElement.style.colorScheme = t.isLight ? 'light' : 'dark';
+}
+
+/* ---------------- 通用 ---------------- */
+
+let toastTimer;
+function toast(html){
+  const el = $('#toast');
+  el.innerHTML = html;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1600);
+}
+
+function daysLeft(deadline){
+  if(!deadline) return null;
+  const end = new Date(deadline + 'T00:00:00');
+  if(isNaN(end)) return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Math.round((end - today) / DAY);
+}
+
+function fmtDate(s){
+  if(!s) return '';
+  const p = s.split('-');
+  if(p.length !== 3) return s;
+  return `${Number(p[1])}月${Number(p[2])}日`;
+}
+
+/* ---------------- 数据 ---------------- */
+
+function migrate(s){
+  s.games.forEach(g => {
+    if(!Array.isArray(g.checkinItems)){
+      g.checkinItems = (g.id === 'lysk') ? structuredClone(DEFAULT_ITEMS) : [];
+    }
+    if(!Array.isArray(g.quickItems)){
+      g.quickItems = (g.id === 'lysk') ? structuredClone(DEFAULT_QUICK) : [];
+    }
+    if(!g.theme || typeof g.theme !== 'object') g.theme = {};
+    if(!isHex(g.theme.accent)) g.theme.accent = '#c96b9e';
+    if(!isHex(g.theme.bg)) g.theme.bg = '#0f1117';
+
+    if(!g.goal || typeof g.goal !== 'object'){
+      g.goal = {
+        title: '目标抽卡',
+        targetPulls: Number(g.target) > 0 ? Number(g.target) : 140,
+        deadline: ''
+      };
+    }
+    if(!(Number(g.goal.targetPulls) > 0)) g.goal.targetPulls = 140;
+    if(typeof g.goal.title !== 'string') g.goal.title = '';
+    if(typeof g.goal.deadline !== 'string') g.goal.deadline = '';
+    delete g.target;
+  });
+  if(!s.games.some(g => g.id === s.activeId)) s.activeId = s.games[0]?.id || 'lysk';
+  return s;
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){
+      const p = JSON.parse(raw);
+      if(p && Array.isArray(p.games) && Array.isArray(p.records)) return migrate(p);
+    }
+  }catch(e){}
+  return structuredClone(DEFAULT);
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+}
+let saveTimer;
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 300);
+}
+
+const activeGame = () =>
+  state.games.find(g => g.id === state.activeId) || state.games[0];
+
+/* ---------------- 打卡 ---------------- */
+
+function checkinTotal(){
+  const g = activeGame();
+  return (g.checkinItems || []).reduce((s, it) => {
+    const n = Number(it.amount);
+    return s + (n > 0 ? n : 0);
+  }, 0);
+}
+
+function isCheckedInToday(){
+  const g = activeGame();
+  const today = dayKey(Date.now());
+  return state.records.some(r =>
+    r.gameId === g.id && r.source === 'checkin' && dayKey(r.ts) === today
+  );
+}
+
+function doCheckin(){
+  const g = activeGame();
+  const items = (g.checkinItems || []).filter(it => Number(it.amount) > 0);
+  if(!items.length) return alert('打卡项都还没填数量，先填一下吧～');
+  if(isCheckedInToday()) return;
+
+  const now = Date.now();
+  items.forEach(it => {
+    state.records.push({
+      id: uid('r'),
+      gameId: g.id,
+      amount: Math.round(Number(it.amount)),
+      note: it.name || '打卡',
+      ts: now,
+      source: 'checkin'
+    });
+  });
+  save();
+  render();
+  toast(`打卡完成 <b>+${checkinTotal().toLocaleString()}</b>`);
+}
+
+function undoCheckin(){
+  const g = activeGame();
+  const today = dayKey(Date.now());
+  state.records = state.records.filter(r =>
+    !(r.gameId === g.id && r.source === 'checkin' && dayKey(r.ts) === today)
+  );
+  save();
+  render();
+}
+
+/* ---------------- 快捷收入 ---------------- */
+
+function quickRecord(it){
+  const g = activeGame();
+  const amt = Math.round(Number(it.amount));
+  if(!(amt > 0)) return;
+  state.records.push({
+    id: uid('r'),
+    gameId: g.id,
+    amount: amt,
+    note: it.name || '快捷收入',
+    ts: Date.now(),
+    source: 'quick'
+  });
+  save();
+  render();
+  toast(`${esc(it.name || '快捷收入')} <b>+${amt.toLocaleString()}</b>`);
+}
+
+let quickDraft = null;
+
+function setQuickMode(mode){
+  const isEdit = mode === 'edit';
+  $('#quickUseView').style.display = isEdit ? 'none' : 'flex';
+  $('#quickEditView').style.display = isEdit ? 'block' : 'none';
+  $('#quickToggleMode').style.display = isEdit ? 'none' : '';
+  if(isEdit){
+    quickDraft = structuredClone(activeGame().quickItems || []);
+    renderQuickDraft();
+  } else {
+    quickDraft = null;
+  }
+}
+
+function openQuickModal(){
+  setQuickMode('use');
+  renderQuick();
+  $('#quickModal').classList.add('show');
+}
+function closeQuickModal(){
+  $('#quickModal').classList.remove('show');
+  quickDraft = null;
+}
+
+function renderQuickDraft(){
+  const box = $('#quickEditList');
+  if(!quickDraft || !quickDraft.length){
+    box.innerHTML = '<div class="empty">还没有快捷收入，点下方添加</div>';
+    return;
+  }
+  box.innerHTML = quickDraft.map(it => `
+    <div class="ci-row">
+      <input class="ci-name" data-qd="${it.id}" data-field="name"
+             value="${esc(it.name)}" maxlength="12" placeholder="名称">
+      <input class="ci-amt" data-qd="${it.id}" data-field="amount"
+             type="number" inputmode="decimal" value="${it.amount}" min="0" placeholder="数量">
+      <button class="ci-del" data-qd-del="${it.id}">×</button>
+    </div>
+  `).join('');
+}
+
+function saveQuickDraft(){
+  if(!quickDraft) return;
+  activeGame().quickItems = quickDraft
+    .filter(it => Number(it.amount) > 0)
+    .map(it => ({
+      id: it.id,
+      name: (it.name || '').trim() || '快捷收入',
+      amount: Math.round(Number(it.amount))
+    }));
+  save();
+  setQuickMode('use');
+  render();
+}
+
+/* ---------------- 氪金记录 ---------------- */
+
+function openPayModal(){
+  $('#payAmountInput').value = '';
+  $('#payGemInput').value = '';
+  $('#payNoteInput').value = '';
+  $('#payModal').classList.add('show');
+  setTimeout(() => $('#payAmountInput').focus(), 60);
+}
+function closePayModal(){ $('#payModal').classList.remove('show'); }
+
+function savePay(){
+  const amount = Number($('#payAmountInput').value);
+  if(!amount || amount <= 0) return alert('请填写充值金额');
+
+  const gemRaw = Number($('#payGemInput').value);
+  const gem = gemRaw > 0 ? Math.round(gemRaw) : 0;
+  const note = $('#payNoteInput').value.trim();
+  const g = activeGame();
+
+  state.records.push({
+    id: uid('r'),
+    gameId: g.id,
+    amount: gem,
+    payAmount: Math.round(amount * 100) / 100,
+    note: note || (gem > 0 ? '氪金' : '氪金（未入账）'),
+    ts: Date.now(),
+    source: 'pay'
+  });
+  save();
+  closePayModal();
+  render();
+  toast(`已记录氪金 <b class="gold">¥${money(amount)}</b>${gem > 0 ? ` · +${gem.toLocaleString()} ${esc(g.currency)}` : ''}`);
+}
+
+/* ---------------- 主题弹窗 ---------------- */
+
+let themeDraft = null;
+
+function openThemeModal(){
+  const g = activeGame();
+  const t = g.theme || {};
+  themeDraft = {
+    accent: isHex(t.accent) ? t.accent : '#c96b9e',
+    bg: isHex(t.bg) ? t.bg : '#0f1117'
+  };
+  $('#themeHint').textContent = `仅对「${g.name}」生效，切换游戏会切换整套配色`;
+  renderThemeModal();
+  $('#themeModal').classList.add('show');
+}
+
+function renderThemeModal(){
+  const aLower = String(themeDraft.accent).toLowerCase();
+  const bLower = String(themeDraft.bg).toLowerCase();
+
+  $('#accentSwatches').innerHTML = PRESET_ACCENTS.map(t => `
+    <button class="swatch ${aLower === t.color.toLowerCase() ? 'active' : ''}"
+            data-accent="${t.color}" title="${t.name}"
+            style="background:${t.color}"></button>
+  `).join('');
+
+  $('#bgSwatches').innerHTML = PRESET_BGS.map(t => `
+    <button class="swatch ${bLower === t.color.toLowerCase() ? 'active' : ''}"
+            data-bg="${t.color}" title="${t.name}"
+            style="background:${t.color}"></button>
+  `).join('');
+
+  $('#accentColorInput').value = themeDraft.accent;
+  $('#accentColorText').textContent = String(themeDraft.accent).toUpperCase();
+  $('#bgColorInput').value = themeDraft.bg;
+  $('#bgColorText').textContent = String(themeDraft.bg).toUpperCase();
+
+  applyTheme({ theme: themeDraft });
+  if($('#chartModal').classList.contains('show')) requestAnimationFrame(drawChart);
+}
+
+function closeThemeModal(restore){
+  if(restore){
+    applyTheme(activeGame());
+    if($('#chartModal').classList.contains('show')) requestAnimationFrame(drawChart);
+  }
+  $('#themeModal').classList.remove('show');
+  themeDraft = null;
+}
+
+function saveTheme(){
+  if(!themeDraft) return;
+  const g = activeGame();
+  g.theme = { accent: themeDraft.accent, bg: themeDraft.bg };
+  save();
+  applyTheme(g);
+  closeThemeModal(false);
+  render();
+  toast('主题已保存');
+}
+
+/* ---------------- 换算器 ---------------- */
+
+function clearConverter(){
+  $('#convGem').value = '';
+  $('#convTicket').value = '';
+}
+
+function syncConverter(){
+  const g = activeGame();
+  $('#convRate').textContent = `${g.perPull} ${g.currency} = 1 金票`;
+}
+
+/* ---------------- 渲染 ---------------- */
+
+function renderTabs(){
+  $('#tabs').innerHTML = state.games.map(g =>
+    `<button class="tab ${g.id===state.activeId?'active':''}" data-id="${g.id}">${esc(g.name)}</button>`
+  ).join('') + `<button class="tab add" id="addGame">＋ 添加游戏</button>`;
+}
+
+function stats(){
+  const g = activeGame();
+  const goal = g.goal || {};
+  const targetPulls = Number(goal.targetPulls) > 0 ? Number(goal.targetPulls) : 140;
+
+  const rs = state.records.filter(r => r.gameId === g.id);
+  const bal = rs.reduce((s, r) => s + r.amount, 0);
+  const pulls = bal / g.perPull;
+  const targetVal = Math.max(1, targetPulls * g.perPull);
+  const pct = Math.max(0, Math.min(100, bal / targetVal * 100));
+  const net30 = rs.filter(r => r.ts > Date.now() - 30*DAY).reduce((s, r) => s + r.amount, 0);
+  const perDay = net30 / 30;
+  const remain = targetVal - bal;
+  const dleft = daysLeft(goal.deadline);
+  const payTotal = rs.reduce((sum, r) => sum + (Number(r.payAmount) || 0), 0);
+
+  let eta = '—';
+  if(remain <= 0) eta = '已达成 🎉';
+  else if(perDay > 0) eta = Math.ceil(remain / perDay) + ' 天后';
+
+  return { g, goal, targetPulls, bal, pulls, pct, perDay, remain, eta, targetVal, dleft, payTotal };
+}
+
+function renderStats(){
+  const s = stats();
+
+  $('#appTitle').textContent = `💎 ${s.g.name} · 攒钻`;
+  document.title = `💎 ${s.g.name} · 攒钻记录`;
+  $('#balUnit').textContent = s.g.currency;
+
+  $('#goalTitle').textContent = s.goal.title || '未命名目标';
+  $('#bal').textContent = s.bal.toLocaleString();
+  $('#sub').innerHTML = `≈ <b>${s.pulls.toFixed(1)}</b> 抽 · 近30天日均 <b>${s.perDay>=0?'+':''}${s.perDay.toFixed(0)}</b> ${esc(s.g.currency)}`;
+  $('#bar').style.width = s.pct + '%';
+  $('#progLeft').textContent = `目标 ${s.targetPulls} 抽（${s.targetVal.toLocaleString()} ${s.g.currency}）`;
+  $('#progRight').textContent = s.remain > 0
+    ? `还差 ${s.remain.toLocaleString()} · ${s.eta}`
+    : s.eta;
+
+  const meta = [];
+  if(s.dleft === null){
+    meta.push('未设置截止日期');
+  } else if(s.dleft > 0){
+    meta.push(`截止 <b>${esc(fmtDate(s.goal.deadline))}</b> · 剩 <b>${s.dleft}</b> 天`);
+    if(s.remain > 0){
+      meta.push(`每天需 <b>+${Math.ceil(s.remain / s.dleft).toLocaleString()}</b> ${esc(s.g.currency)}`);
+    } else {
+      meta.push('目标已达成 🎉');
+    }
+  } else if(s.dleft === 0){
+    meta.push(`<span class="warn">今天截止</span>`);
+    if(s.remain > 0) meta.push(`还需 <b>${s.remain.toLocaleString()}</b> ${esc(s.g.currency)}`);
+  } else {
+    meta.push(`<span class="warn">已过期 ${-s.dleft} 天</span>`);
+    if(s.remain > 0) meta.push(`还差 <b>${s.remain.toLocaleString()}</b> ${esc(s.g.currency)}`);
+  }
+  $('#goalMeta').innerHTML = meta.join('　·　');
+
+  const payEl = $('#payMeta');
+  if(s.payTotal > 0){
+    payEl.classList.add('show');
+    payEl.innerHTML = `累计氪金 <b>¥${money(s.payTotal)}</b>`;
+  } else {
+    payEl.classList.remove('show');
+  }
+}
+
+function renderQuick(){
+  const items = activeGame().quickItems || [];
+  const box = $('#quickChips');
+  if(!items.length){
+    box.innerHTML = '<div class="empty" style="width:100%">还没有快捷收入，点右上角「编辑」添加</div>';
+    return;
+  }
+  box.innerHTML = items.map(it => `
+    <button class="chip" data-quick="${it.id}">
+      <span class="cn">${esc(it.name)}</span>
+      <span class="ca">+${Number(it.amount).toLocaleString()}</span>
+    </button>
+  `).join('');
+}
+
+function updateCheckinBtn(){
+  const g = activeGame();
+  const items = g.checkinItems || [];
+  const checked = isCheckedInToday();
+  const btn = $('#checkinBtn');
+  btn.classList.toggle('done', checked);
+  btn.textContent = checked
+    ? '今日已打卡 ✓'
+    : (items.length ? `一键打卡 +${checkinTotal().toLocaleString()} ${g.currency}` : '一键打卡');
+}
+
+function renderCheckin(){
+  const g = activeGame();
+  const items = g.checkinItems || [];
+
+  if(!items.length){
+    $('#checkinList').innerHTML = '<div class="empty">还没有打卡项，点下方添加</div>';
+  } else {
+    $('#checkinList').innerHTML = items.map(it => `
+      <div class="ci-row">
+        <input class="ci-name" data-ci="${it.id}" data-field="name"
+               value="${esc(it.name)}" maxlength="12" placeholder="项目名">
+        <input class="ci-amt" data-ci="${it.id}" data-field="amount"
+               type="number" inputmode="decimal" value="${it.amount}" min="0" placeholder="数量">
+        <button class="ci-del" data-ci-del="${it.id}">×</button>
+      </div>
+    `).join('');
+  }
+  updateCheckinBtn();
+}
+
+function renderLog(){
+  const g = activeGame();
+  const all = state.records.filter(r => r.gameId === g.id);
+  const income = all.filter(r => r.amount > 0).reduce((s, r) => s + r.amount, 0);
+  const expense = all.filter(r => r.amount < 0).reduce((s, r) => s + r.amount, 0);
+  const payTotal = all.reduce((s, r) => s + (Number(r.payAmount) || 0), 0);
+
+  let summary = `
+    <span>共 <b>${all.length}</b> 条</span>
+    <span>收入 <b style="color:var(--green)">+${income.toLocaleString()}</b></span>
+    <span>支出 <b style="color:var(--red)">${expense.toLocaleString()}</b></span>
+  `;
+  if(payTotal > 0){
+    summary += `<span>氪金 <b style="color:var(--gold)">¥${money(payTotal)}</b></span>`;
+  }
+  $('#logSummary').innerHTML = summary;
+
+  const rs = [...all].sort((a, b) => b.ts - a.ts).slice(0, 200);
+  if(!rs.length){
+    $('#logList').innerHTML = '<div class="empty">还没有记录，先记一笔吧 ~</div>';
+    return;
+  }
+  $('#logList').innerHTML = rs.map(r => {
+    const d = new Date(r.ts);
+    const t = `${d.getMonth()+1}/${d.getDate()}`;
+    const hasPay = Number(r.payAmount) > 0;
+    const payTag = hasPay ? `<span class="pay-tag">¥${money(r.payAmount)}</span>` : '';
+    let amtHtml;
+    if(hasPay && !r.amount){
+      amtHtml = `<span class="a pay">未入账</span>`;
+    } else {
+      const cls = r.amount > 0 ? 'pos' : 'neg';
+      amtHtml = `<span class="a ${cls}">${r.amount>0?'+':''}${r.amount.toLocaleString()}</span>`;
+    }
+    return `<div class="item">
+      <span class="t">${t}</span>
+      <span class="n">${esc(r.note || '—')}${payTag}</span>
+      ${amtHtml}
+      <button class="del" data-del="${r.id}">×</button>
+    </div>`;
+  }).join('');
+}
+
+function render(){
+  applyTheme(activeGame());
+  renderTabs();
+  renderStats();
+  renderQuick();
+  renderCheckin();
+  renderLog();
+  syncConverter();
+  if($('#chartModal').classList.contains('show')) requestAnimationFrame(drawChart);
+}
+
+/* ---------------- 折线图 ---------------- */
+
+function balanceSeries(days = 30){
+  const g = activeGame();
+  const rs = state.records
+    .filter(r => r.gameId === g.id)
+    .sort((a, b) => a.ts - b.ts);
+
+  const dayLast = new Map();
+  let acc = 0;
+  for(const r of rs){
+    acc += r.amount;
+    dayLast.set(dayKey(r.ts), acc);
+  }
+
+  const out = [];
+  let last = 0;
+  for(let i = days - 1; i >= 0; i--){
+    const k = dayKey(Date.now() - i * DAY);
+    if(dayLast.has(k)) last = dayLast.get(k);
+    out.push(last);
+  }
+  return out;
+}
+
+function drawChart(){
+  const cv = $('#chartBig');
+  if(!cv) return;
+  const w = cv.clientWidth;
+  if(w < 10) return;
+  const h = 190;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(h * dpr);
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+
+  const cssVars = getComputedStyle(document.documentElement);
+  const accentLight = cssVars.getPropertyValue('--accent-light').trim() || '#e8a0c4';
+  const accentRgb = cssVars.getPropertyValue('--accent-rgb').trim() || '201,107,158';
+
+  const data = balanceSeries();
+  const max = Math.max(...data), min = Math.min(...data);
+  const span = (max - min) || Math.max(1, Math.abs(max) * 0.1);
+  const lo = min - span * 0.2, hi = max + span * 0.2;
+  const pad = 8;
+  const X = i => pad + (w - pad*2) * (i / (data.length - 1));
+  const Y = v => h - pad - (h - pad*2) * ((v - lo) / (hi - lo));
+
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, `rgba(${accentRgb},.35)`);
+  grad.addColorStop(1, `rgba(${accentRgb},0)`);
+  ctx.beginPath();
+  ctx.moveTo(X(0), Y(data[0]));
+  for(let i = 1; i < data.length; i++) ctx.lineTo(X(i), Y(data[i]));
+  ctx.lineTo(X(data.length - 1), h - pad);
+  ctx.lineTo(X(0), h - pad);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(X(0), Y(data[0]));
+  for(let i = 1; i < data.length; i++) ctx.lineTo(X(i), Y(data[i]));
+  ctx.strokeStyle = accentLight;
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.stroke();
+
+  const now = data[data.length - 1];
+  const start = data[0];
+  const diff = now - start;
+  $('#chartInfo').innerHTML =
+    `近 30 天：<b style="color:${diff>=0?'var(--green)':'var(--red)'}">${diff>=0?'+':''}${diff.toLocaleString()}</b> ${esc(activeGame().currency)} · ` +
+    `当前 <b>${now.toLocaleString()}</b> · ` +
+    `折合 <b>${(now / activeGame().perPull).toFixed(1)}</b> 抽`;
+}
+
+/* ---------------- 添加游戏 ---------------- */
+
+function openGameModal(){
+  const cur = activeGame();
+  $('#gameNameInput').value = '';
+  $('#gameCurrencyInput').value = cur ? cur.currency : '红钻';
+  $('#gamePerPullInput').value = cur ? cur.perPull : 150;
+  $('#gameTargetInput').value = 140;
+  const c = (cur && cur.theme && isHex(cur.theme.accent)) ? cur.theme.accent : '#c96b9e';
+  $('#gameColorInput').value = c;
+  $('#gameColorText').textContent = c.toUpperCase();
+  $('#gameModal').classList.add('show');
+  setTimeout(() => $('#gameNameInput').focus(), 60);
+}
+function closeGameModal(){ $('#gameModal').classList.remove('show'); }
+
+function saveGameModal(){
+  const name = $('#gameNameInput').value.trim();
+  if(!name) return alert('请填写游戏名称');
+  const currency = $('#gameCurrencyInput').value.trim() || '钻石';
+  const perPull = Number($('#gamePerPullInput').value);
+  if(!perPull || perPull <= 0) return alert('每抽价格要大于 0');
+  const target = Number($('#gameTargetInput').value) || 140;
+  let accent = $('#gameColorInput').value;
+  if(!isHex(accent)) accent = '#c96b9e';
+
+  const cur = activeGame();
+  const inheritBg = (cur && cur.theme && isHex(cur.theme.bg)) ? cur.theme.bg : '#0f1117';
+
+  const id = 'g' + Date.now();
+  state.games.push({
+    id,
+    name,
+    currency,
+    perPull,
+    goal: { title: '目标抽卡', targetPulls: target, deadline: '' },
+    checkinItems: [],
+    quickItems: [],
+    theme: { accent, bg: inheritBg }
+  });
+  state.activeId = id;
+  save();
+  closeGameModal();
+  clearConverter();
+  render();
+  toast(`已添加 <b>${esc(name)}</b>，可去 🎨 主题 调整背景色`);
+}
+
+/* ---------------- 目标编辑 ---------------- */
+
+function openGoalModal(){
+  const goal = activeGame().goal || {};
+  $('#goalTitleInput').value = goal.title || '';
+  $('#goalPullsInput').value = goal.targetPulls || 140;
+  $('#goalDateInput').value = goal.deadline || '';
+  $('#goalModal').classList.add('show');
+  setTimeout(() => $('#goalTitleInput').focus(), 60);
+}
+function closeGoalModal(){ $('#goalModal').classList.remove('show'); }
+
+function saveGoal(){
+  const pulls = Number($('#goalPullsInput').value);
+  if(!pulls || pulls <= 0) return alert('目标抽数要大于 0 哦');
+
+  const g = activeGame();
+  g.goal = {
+    title: $('#goalTitleInput').value.trim() || '未命名目标',
+    targetPulls: Math.round(pulls),
+    deadline: $('#goalDateInput').value || ''
+  };
+  save();
+  closeGoalModal();
+  render();
+}
+
+/* ---------------- 手动记录 ---------------- */
+
+function addRecord(sign){
+  const amtEl = $('#amount'), noteEl = $('#note');
+  const v = Number(amtEl.value);
+  if(!v || v <= 0){ amtEl.focus(); return; }
+
+  const g = activeGame();
+  state.records.push({
+    id: uid('r'),
+    gameId: g.id,
+    amount: Math.round(v) * sign,
+    note: noteEl.value.trim(),
+    ts: Date.now()
+  });
+  amtEl.value = '';
+  noteEl.value = '';
+  save();
+  render();
+  amtEl.focus();
+}
+
+/* ---------------- 事件绑定 ---------------- */
+
+$('#tabs').addEventListener('click', e => {
+  const add = e.target.closest('#addGame');
+  if(add) return openGameModal();
+  const tab = e.target.closest('.tab[data-id]');
+  if(!tab) return;
+  if(tab.dataset.id === state.activeId) return;
+  state.activeId = tab.dataset.id;
+  save();
+  clearConverter();
+  render();
+});
+
+document.querySelectorAll('.btn[data-sign]').forEach(btn => {
+  btn.addEventListener('click', () => addRecord(Number(btn.dataset.sign)));
+});
+
+$('#amount').addEventListener('keydown', e => { if(e.key === 'Enter') addRecord(1); });
+$('#note').addEventListener('keydown', e => { if(e.key === 'Enter') addRecord(1); });
+
+/* 换算器 */
+$('#convGem').addEventListener('input', () => {
+  const per = activeGame().perPull;
+  const gem = Number($('#convGem').value);
+  if(!gem || gem <= 0){ $('#convTicket').value = ''; return; }
+  const t = gem / per;
+  $('#convTicket').value = (Math.round(t * 100) / 100).toString();
+});
+$('#convTicket').addEventListener('input', () => {
+  const per = activeGame().perPull;
+  const t = Number($('#convTicket').value);
+  if(!t || t <= 0){ $('#convGem').value = ''; return; }
+  $('#convGem').value = Math.round(t * per).toString();
+});
+
+/* 氪金弹窗 */
+$('#openPay').addEventListener('click', openPayModal);
+$('#payCancel').addEventListener('click', closePayModal);
+$('#paySave').addEventListener('click', savePay);
+$('#payModal').addEventListener('click', e => {
+  if(e.target.id === 'payModal') closePayModal();
+});
+$('#payQuick').addEventListener('click', e => {
+  const b = e.target.closest('[data-pay]');
+  if(!b) return;
+  $('#payAmountInput').value = b.dataset.pay;
+  $('#payGemInput').focus();
+});
+$('#payAmountInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') $('#payGemInput').focus();
+});
+$('#payGemInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') $('#payNoteInput').focus();
+});
+$('#payNoteInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') savePay();
+});
+
+/* 主题弹窗 */
+$('#themeBtn').addEventListener('click', openThemeModal);
+$('#themeCancel').addEventListener('click', () => closeThemeModal(true));
+$('#themeSave').addEventListener('click', saveTheme);
+$('#themeModal').addEventListener('click', e => {
+  if(e.target.id === 'themeModal') closeThemeModal(true);
+});
+$('#accentSwatches').addEventListener('click', e => {
+  const sw = e.target.closest('[data-accent]');
+  if(!sw || !themeDraft) return;
+  themeDraft.accent = sw.dataset.accent;
+  renderThemeModal();
+});
+$('#bgSwatches').addEventListener('click', e => {
+  const sw = e.target.closest('[data-bg]');
+  if(!sw || !themeDraft) return;
+  themeDraft.bg = sw.dataset.bg;
+  renderThemeModal();
+});
+$('#accentColorInput').addEventListener('input', e => {
+  if(!themeDraft || !isHex(e.target.value)) return;
+  themeDraft.accent = e.target.value;
+  renderThemeModal();
+});
+$('#bgColorInput').addEventListener('input', e => {
+  if(!themeDraft || !isHex(e.target.value)) return;
+  themeDraft.bg = e.target.value;
+  renderThemeModal();
+});
+
+/* 快捷收入 */
+$('#openQuick').addEventListener('click', openQuickModal);
+$('#quickClose').addEventListener('click', closeQuickModal);
+$('#quickModal').addEventListener('click', e => {
+  if(e.target.id === 'quickModal') closeQuickModal();
+});
+$('#quickToggleMode').addEventListener('click', () => setQuickMode('edit'));
+$('#quickCancelEdit').addEventListener('click', () => setQuickMode('use'));
+$('#quickSave').addEventListener('click', saveQuickDraft);
+
+$('#quickChips').addEventListener('click', e => {
+  const chip = e.target.closest('[data-quick]');
+  if(!chip) return;
+  const it = (activeGame().quickItems || []).find(x => x.id === chip.dataset.quick);
+  if(it) quickRecord(it);
+});
+
+$('#quickAddRow').addEventListener('click', () => {
+  if(!quickDraft) return;
+  quickDraft.push({ id: uid('q'), name: '', amount: 0 });
+  renderQuickDraft();
+  const names = document.querySelectorAll('#quickEditList .ci-name');
+  const last = names[names.length - 1];
+  if(last) last.focus();
+});
+$('#quickEditList').addEventListener('input', e => {
+  const inp = e.target.closest('[data-qd]');
+  if(!inp || !quickDraft) return;
+  const it = quickDraft.find(x => x.id === inp.dataset.qd);
+  if(!it) return;
+  if(inp.dataset.field === 'name') it.name = inp.value;
+  else it.amount = Number(inp.value) || 0;
+});
+$('#quickEditList').addEventListener('click', e => {
+  const del = e.target.closest('[data-qd-del]');
+  if(!del || !quickDraft) return;
+  quickDraft = quickDraft.filter(x => x.id !== del.dataset.qdDel);
+  renderQuickDraft();
+});
+$('#quickEditList').addEventListener('keydown', e => {
+  if(e.key === 'Enter') saveQuickDraft();
+});
+
+/* 打卡 */
+$('#checkinBtn').addEventListener('click', () => {
+  if(isCheckedInToday()){
+    if(confirm('撤销今日打卡？会删除今天所有打卡记录')) undoCheckin();
+    return;
+  }
+  doCheckin();
+});
+
+$('#checkinList').addEventListener('input', e => {
+  const inp = e.target.closest('[data-ci]');
+  if(!inp) return;
+  const it = (activeGame().checkinItems || []).find(x => x.id === inp.dataset.ci);
+  if(!it) return;
+  if(inp.dataset.field === 'name') it.name = inp.value;
+  else it.amount = Number(inp.value) || 0;
+  updateCheckinBtn();
+  scheduleSave();
+});
+
+$('#checkinList').addEventListener('click', e => {
+  const del = e.target.closest('[data-ci-del]');
+  if(!del) return;
+  const g = activeGame();
+  g.checkinItems = (g.checkinItems || []).filter(x => x.id !== del.dataset.ciDel);
+  save();
+  render();
+});
+
+$('#addCheckin').addEventListener('click', () => {
+  const g = activeGame();
+  if(!g.checkinItems) g.checkinItems = [];
+  g.checkinItems.push({ id: uid('ci'), name: '新项目', amount: 0 });
+  save();
+  render();
+  const inputs = document.querySelectorAll('#checkinList .ci-name');
+  const last = inputs[inputs.length - 1];
+  if(last){ last.focus(); last.select(); }
+});
+
+/* 趋势弹窗 */
+$('#openChart').addEventListener('click', () => {
+  $('#chartModal').classList.add('show');
+  requestAnimationFrame(drawChart);
+});
+$('#chartClose').addEventListener('click', () => $('#chartModal').classList.remove('show'));
+$('#chartModal').addEventListener('click', e => {
+  if(e.target.id === 'chartModal') $('#chartModal').classList.remove('show');
+});
+
+/* 流水弹窗 */
+$('#openLog').addEventListener('click', () => {
+  renderLog();
+  $('#logModal').classList.add('show');
+});
+$('#logClose').addEventListener('click', () => $('#logModal').classList.remove('show'));
+$('#logModal').addEventListener('click', e => {
+  if(e.target.id === 'logModal') $('#logModal').classList.remove('show');
+});
+$('#logList').addEventListener('click', e => {
+  const btn = e.target.closest('[data-del]');
+  if(!btn) return;
+  state.records = state.records.filter(r => r.id !== btn.dataset.del);
+  save();
+  render();
+});
+
+/* 添加游戏弹窗 */
+$('#gameCancel').addEventListener('click', closeGameModal);
+$('#gameSave').addEventListener('click', saveGameModal);
+$('#gameModal').addEventListener('click', e => {
+  if(e.target.id === 'gameModal') closeGameModal();
+});
+$('#gameColorInput').addEventListener('input', e => {
+  $('#gameColorText').textContent = e.target.value.toUpperCase();
+});
+$('#gameNameInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') $('#gameCurrencyInput').focus();
+});
+$('#gameTargetInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') saveGameModal();
+});
+
+/* 目标弹窗 */
+$('#goalEdit').addEventListener('click', openGoalModal);
+$('#goalCancel').addEventListener('click', closeGoalModal);
+$('#goalSave').addEventListener('click', saveGoal);
+$('#goalModal').addEventListener('click', e => {
+  if(e.target.id === 'goalModal') closeGoalModal();
+});
+document.querySelectorAll('#goalModal .quick button').forEach(btn => {
+  btn.addEventListener('click', () => { $('#goalPullsInput').value = btn.dataset.pull; });
+});
+$('#goalPullsInput').addEventListener('keydown', e => { if(e.key === 'Enter') saveGoal(); });
+$('#goalTitleInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') $('#goalPullsInput').focus();
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if($('#themeModal').classList.contains('show')){ closeThemeModal(true); return; }
+  if($('#payModal').classList.contains('show')){ closePayModal(); return; }
+  ['gameModal','goalModal','quickModal','chartModal','logModal'].forEach(id => {
+    document.getElementById(id).classList.remove('show');
+  });
+});
+
+/* 导入导出 */
+$('#export').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `gem-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+$('#import').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if(!f) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    try{
+      const p = JSON.parse(fr.result);
+      if(!p.games || !p.records) throw 0;
+      state = migrate(p);
+      save();
+      render();
+    }catch(err){
+      alert('文件格式不正确');
+    }
+    e.target.value = '';
+  };
+  fr.readAsText(f);
+});
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if($('#chartModal').classList.contains('show')) drawChart();
+  }, 100);
+});
+
+/* 启动 */
+state = load();
+if(!state.games.length) state = structuredClone(DEFAULT);
+render();
+</script>
+</body>
+</html>
