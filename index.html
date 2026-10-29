@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💎 恋与深空 · 攒钻记录</title>
- <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -153,6 +153,29 @@
   .entry input[type=number]{flex:0 0 42%}
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+  /* 备注下拉容器 */
+  .input-wrap{flex:1;position:relative;min-width:0}
+  .input-wrap input{width:100%}
+  .note-dropdown{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;
+    background:var(--card2);border:1px solid var(--line);border-radius:10px;
+    padding:6px;z-index:20;display:none;
+    box-shadow:0 8px 24px rgba(0,0,0,.3);
+    max-height:180px;overflow-y:auto;
+  }
+  .note-dropdown.show{display:flex;flex-wrap:wrap;gap:6px}
+  .note-tag{
+    background:var(--card);border:1px solid var(--line);color:var(--text);
+    padding:5px 8px;border-radius:6px;font-size:13px;cursor:pointer;
+    display:flex;align-items:center;gap:6px;transition:.12s;
+  }
+  .note-tag:hover{border-color:var(--accent)}
+  .note-tag .nt-del{
+    color:var(--faint);font-size:14px;line-height:1;
+    padding:2px;border-radius:4px;
+  }
+  .note-tag .nt-del:hover{color:var(--red);background:rgba(255,107,129,.1)}
 
   .btn{
     flex:1;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--card2);
@@ -345,7 +368,10 @@
   <div class="card">
     <div class="entry">
       <input id="amount" type="number" inputmode="decimal" placeholder="红钻数量">
-      <input id="note" type="text" placeholder="备注（活动 / 补偿…）" maxlength="20">
+      <div class="input-wrap">
+        <input id="note" type="text" placeholder="备注（选填）" maxlength="20" autocomplete="off">
+        <div class="note-dropdown" id="noteDropdown"></div>
+      </div>
     </div>
     <div class="entry">
       <button class="btn in" data-sign="1">＋ 收入</button>
@@ -595,6 +621,7 @@ const DEFAULT = {
       goal: { title: '大保底攒钻', targetPulls: 140, deadline: '' },
       checkinItems: structuredClone(DEFAULT_ITEMS),
       quickItems: structuredClone(DEFAULT_QUICK),
+      notePresets: ['日常', '月卡', '活动', '补偿', '限定池'],
       theme: { accent: '#c96b9e', bg: '#0f1117' }
     }
   ],
@@ -755,6 +782,9 @@ function migrate(s){
     if(!Array.isArray(g.quickItems)){
       g.quickItems = (g.id === 'lysk') ? structuredClone(DEFAULT_QUICK) : [];
     }
+    if(!Array.isArray(g.notePresets)){
+      g.notePresets = (g.id === 'lysk') ? structuredClone(DEFAULT.games[0].notePresets) : [];
+    }
     if(!g.theme || typeof g.theme !== 'object') g.theme = {};
     if(!isHex(g.theme.accent)) g.theme.accent = '#c96b9e';
     if(!isHex(g.theme.bg)) g.theme.bg = '#0f1117';
@@ -796,6 +826,76 @@ function scheduleSave(){
 
 const activeGame = () =>
   state.games.find(g => g.id === state.activeId) || state.games[0];
+
+/* ---------------- 备注下拉逻辑 ---------------- */
+
+function addNotePreset(note) {
+  if (!note) return;
+  const g = activeGame();
+  if (!g.notePresets) g.notePresets = [];
+  // 去重并放到最前面
+  g.notePresets = g.notePresets.filter(n => n !== note);
+  g.notePresets.unshift(note);
+  // 限制最多保存15个
+  if (g.notePresets.length > 15) g.notePresets.pop();
+  scheduleSave();
+}
+
+function renderNoteDropdown(filterText = '') {
+  const g = activeGame();
+  const presets = g.notePresets || [];
+  
+  const filtered = filterText 
+    ? presets.filter(p => p.toLowerCase().includes(filterText.toLowerCase()) && p !== filterText) 
+    : presets;
+
+  const box = $('#noteDropdown');
+  if (filtered.length === 0) {
+    box.classList.remove('show');
+    return;
+  }
+
+  box.innerHTML = filtered.map(p => `
+    <div class="note-tag" data-note="${esc(p)}">
+      ${esc(p)}
+      <span class="nt-del" data-note-del="${esc(p)}">×</span>
+    </div>
+  `).join('');
+  box.classList.add('show');
+}
+
+function hideNoteDropdown() {
+  setTimeout(() => $('#noteDropdown').classList.remove('show'), 150);
+}
+
+/* 事件绑定 */
+$('#note').addEventListener('focus', e => renderNoteDropdown(e.target.value));
+$('#note').addEventListener('input', e => renderNoteDropdown(e.target.value));
+$('#note').addEventListener('blur', hideNoteDropdown);
+
+$('#noteDropdown').addEventListener('mousedown', e => {
+  // 阻止默认行为防止 input 失焦
+  if(e.target.closest('.note-tag')) e.preventDefault();
+});
+$('#noteDropdown').addEventListener('click', e => {
+  const delBtn = e.target.closest('[data-note-del]');
+  if (delBtn) {
+    // 删除预设
+    const noteToDel = delBtn.dataset.noteDel;
+    const g = activeGame();
+    g.notePresets = g.notePresets.filter(n => n !== noteToDel);
+    save();
+    renderNoteDropdown($('#note').value);
+    return;
+  }
+  
+  const tag = e.target.closest('[data-note]');
+  if (tag) {
+    $('#note').value = tag.dataset.note;
+    $('#noteDropdown').classList.remove('show');
+    $('#note').focus(); // 重新获取焦点，方便点收入/支出
+  }
+});
 
 /* ---------------- 打卡 ---------------- */
 
@@ -861,6 +961,7 @@ function quickRecord(it){
     ts: Date.now(),
     source: 'quick'
   });
+  addNotePreset(it.name || '快捷收入');
   save();
   render();
   toast(`${esc(it.name || '快捷收入')} <b>+${amt.toLocaleString()}</b>`);
@@ -941,6 +1042,8 @@ function savePay(){
   const gem = gemRaw > 0 ? Math.round(gemRaw) : 0;
   const note = $('#payNoteInput').value.trim();
   const g = activeGame();
+
+  if(note) addNotePreset(note);
 
   state.records.push({
     id: uid('r'),
@@ -1323,6 +1426,7 @@ function saveGameModal(){
     goal: { title: '目标抽卡', targetPulls: target, deadline: '' },
     checkinItems: [],
     quickItems: [],
+    notePresets: [],
     theme: { accent, bg: inheritBg }
   });
   state.activeId = id;
@@ -1368,15 +1472,19 @@ function addRecord(sign){
   if(!v || v <= 0){ amtEl.focus(); return; }
 
   const g = activeGame();
+  const noteVal = noteEl.value.trim();
+  if(noteVal) addNotePreset(noteVal);
+
   state.records.push({
     id: uid('r'),
     gameId: g.id,
     amount: Math.round(v) * sign,
-    note: noteEl.value.trim(),
+    note: noteVal,
     ts: Date.now()
   });
   amtEl.value = '';
   noteEl.value = '';
+  $('#noteDropdown').classList.remove('show');
   save();
   render();
   amtEl.focus();
