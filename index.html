@@ -833,10 +833,8 @@ function addNotePreset(note) {
   if (!note) return;
   const g = activeGame();
   if (!g.notePresets) g.notePresets = [];
-  // 去重并放到最前面
   g.notePresets = g.notePresets.filter(n => n !== note);
   g.notePresets.unshift(note);
-  // 限制最多保存15个
   if (g.notePresets.length > 15) g.notePresets.pop();
   scheduleSave();
 }
@@ -868,19 +866,16 @@ function hideNoteDropdown() {
   setTimeout(() => $('#noteDropdown').classList.remove('show'), 150);
 }
 
-/* 事件绑定 */
 $('#note').addEventListener('focus', e => renderNoteDropdown(e.target.value));
 $('#note').addEventListener('input', e => renderNoteDropdown(e.target.value));
 $('#note').addEventListener('blur', hideNoteDropdown);
 
 $('#noteDropdown').addEventListener('mousedown', e => {
-  // 阻止默认行为防止 input 失焦
   if(e.target.closest('.note-tag')) e.preventDefault();
 });
 $('#noteDropdown').addEventListener('click', e => {
   const delBtn = e.target.closest('[data-note-del]');
   if (delBtn) {
-    // 删除预设
     const noteToDel = delBtn.dataset.noteDel;
     const g = activeGame();
     g.notePresets = g.notePresets.filter(n => n !== noteToDel);
@@ -893,7 +888,7 @@ $('#noteDropdown').addEventListener('click', e => {
   if (tag) {
     $('#note').value = tag.dataset.note;
     $('#noteDropdown').classList.remove('show');
-    $('#note').focus(); // 重新获取焦点，方便点收入/支出
+    $('#note').focus();
   }
 });
 
@@ -964,7 +959,7 @@ function quickRecord(it){
   addNotePreset(it.name || '快捷收入');
   save();
   render();
-  toast(`${esc(it.name || '快捷收入')} <b>+${amt.toLocaleString()}</b>`);
+  toast(`已记录 <b>+${amt.toLocaleString()}</b>`);
 }
 
 let quickDraft = null;
@@ -1482,12 +1477,21 @@ function addRecord(sign){
     note: noteVal,
     ts: Date.now()
   });
+  
   amtEl.value = '';
   noteEl.value = '';
   $('#noteDropdown').classList.remove('show');
   save();
   render();
-  amtEl.focus();
+  
+  // 让手机端输入法收起
+  if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+      document.activeElement.blur();
+  }
+
+  // 弹出提示
+  const signStr = sign > 0 ? '+' : '-';
+  toast(`已记录 <b>${signStr}${Math.round(v).toLocaleString()}</b>`);
 }
 
 /* ---------------- 事件绑定 ---------------- */
